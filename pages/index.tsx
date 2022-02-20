@@ -1,5 +1,18 @@
 import type { NextPage } from 'next';
 import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
+import FontColor from '../components/FontColor';
+import FontPerspective from '../components/FontPerspective';
+import FontSize from '../components/FontSize';
+import FontWeight from '../components/FontWeight';
+import SettingsSection from '../components/SettingsSection';
+import TextBox from '../components/TextBox';
+import TextPosition from '../components/TextPosition';
+import TextShadow from '../components/TextShadow';
+import Colors from '../types/Colors';
+import Position from '../types/Position';
+import Rotation from '../types/Rotation';
+import Sizes from '../types/Sizes';
+import Weights from '../types/Weigths';
 
 const Home: NextPage = () => {
   const [text, setText] = useState<string>('');
@@ -7,14 +20,16 @@ const Home: NextPage = () => {
   const inputField = useRef<HTMLTextAreaElement | null>(null);
   const title = useRef<HTMLHeadingElement | null>(null);
 
-  const [position, setPosition] = useState<{ x: number; y: number }>({
+  const [position, setPosition] = useState<Position>({
     x: 0,
     y: 0,
   });
 
-  const [rotation, setRotation] = useState<{ x: number; y: number; z: number }>(
-    { x: 0, y: 0, z: 0 }
-  );
+  const [rotation, setRotation] = useState<Rotation>({
+    x: 0,
+    y: 0,
+    z: 0,
+  });
 
   const applyText = (event: SyntheticEvent) => {
     if (inputField && inputField.current) {
@@ -22,27 +37,19 @@ const Home: NextPage = () => {
     }
   };
 
-  interface Sizes {
-    [index: string]: string;
-  }
-
   const increaseSize = (size: string) => {
     const sizes: Sizes = {
       S: 'text-2xl',
       M: 'text-4xl',
       L: 'text-6xl',
       XL: 'text-9xl',
-      default: 'text-9xl',
+      default: 'text-6xl',
     };
     if (size !== 'default') {
       title?.current?.classList.remove(...Object.values(sizes));
       title?.current?.classList.add(sizes[size]);
     }
   };
-
-  interface Weights {
-    [index: string]: string;
-  }
 
   const changeFontWeight = (weight: string) => {
     const fontWeights: Weights = {
@@ -59,10 +66,6 @@ const Home: NextPage = () => {
     }
   };
 
-  interface Colors {
-    [index: string]: string;
-  }
-
   const textColors: Colors = {
     black: 'text-black',
     cyan: 'text-cyan-500',
@@ -70,15 +73,6 @@ const Home: NextPage = () => {
     yellow: 'text-yellow-500',
     violet: 'text-violet-500',
     pink: 'text-pink-800',
-  };
-
-  const backgroundColors: Colors = {
-    black: 'bg-black',
-    cyan: 'bg-cyan-500',
-    teal: 'bg-teal-500',
-    yellow: 'bg-yellow-500',
-    violet: 'bg-violet-500',
-    pink: 'bg-pink-800',
   };
 
   const changeColor = (color: string) => {
@@ -136,172 +130,40 @@ const Home: NextPage = () => {
       <aside className="flex-none w-3/12">
         <h2 className="text-2xl mt-2 mb-4">Settings</h2>
 
-        <section className="mb-6">
-          <label className="block font-semibold text-1xl">Text</label>
-          <textarea
-            ref={inputField}
-            className="block shadow-md rounded ring-1 my-4 p-4 text-lg"
-          ></textarea>
-          <button
-            className="bg-purple-500 py-3 px-12 rounded-lg text-white"
-            onClick={applyText}
-          >
-            Apply
-          </button>
-        </section>
+        <SettingsSection label="Text">
+          <TextBox inputField={inputField} onApplyText={applyText} />
+        </SettingsSection>
 
-        <label className="block font-semibold text-1xl mb-2">
-          Font Settings
-        </label>
-        <div className="flex mb-6">
-          {['S', 'M', 'L', 'XL'].map((size) => (
-            <button
-              key={size}
-              onClick={() => increaseSize(size)}
-              className={`border ${
-                text ? 'bg-indigo-500' : 'bg-indigo-300'
-              } rounded-md text-lg text-white px-4 py-2`}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
+        <SettingsSection label="Font Settings">
+          <FontSize onIncreaseSize={increaseSize} text={text} />
+        </SettingsSection>
 
-        <label className="block font-semibold text-1xl mb-2">Font Weight</label>
-        <div className="flex mb-6">
-          {['thin', 'normal', 'semibold', 'bold'].map((weight) => (
-            <button
-              key={weight}
-              onClick={() => changeFontWeight(weight)}
-              className={`border ${
-                text ? 'bg-indigo-500' : 'bg-indigo-300'
-              } rounded-md text-sm text-white px-3 py-2`}
-            >
-              {weight}
-            </button>
-          ))}
-        </div>
+        <SettingsSection label="Font Weight">
+          <FontWeight onChangeFontWeight={changeFontWeight} text={text} />
+        </SettingsSection>
 
-        <section className="mb-6">
-          <label className="block font-semibold text-1xl mb-2">Color</label>
-          <div className="flex">
-            {Object.keys(backgroundColors).map((color) => (
-              <div
-                className={`cursor-pointer w-8 h-8 ${backgroundColors[color]} px-4 mr-2`}
-                key={color}
-                onClick={() => changeColor(color)}
-                style={{ borderRadius: '50%' }}
-              >
-                &nbsp;
-              </div>
-            ))}
-          </div>
-        </section>
+        <SettingsSection label="Color">
+          <FontColor onChangeColor={changeColor} />
+        </SettingsSection>
 
-        <section className="mb-6">
-          <label className="block font-semibold text-1xl mb-2">Shadow</label>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                name="shadow"
-                className="mr-2"
-                onChange={toggleShadow}
-              />
-              Shadow
-            </label>
-          </div>
-        </section>
+        <SettingsSection label="Shadow">
+          <TextShadow onToggleShadow={toggleShadow} />
+        </SettingsSection>
 
         <div className="flex gap-6">
-          <section className="mb-6">
-            <label className="block font-semibold text-1xl mb-2">
-              Position
-            </label>
-            <div>
-              <label htmlFor="xpos" className="block text-sm">
-                {' '}
-                x-Pos{' '}
-                <span className="text-xs text-gray-500">({position.x})</span>
-              </label>
-              <input
-                className="block"
-                type="range"
-                id="xpos"
-                name="xpos"
-                min="-400"
-                max="400"
-                onChange={moveX}
-                value={position.x}
-              />
-            </div>
-            <label htmlFor="ypos" className="block text-sm mt-2">
-              {' '}
-              y-Pos{' '}
-              <span className="text-xs text-gray-500">({position.y})</span>
-            </label>
-            <input
-              className="block"
-              type="range"
-              id="ypos"
-              name="ypos"
-              min="-400"
-              max="400"
-              onChange={moveY}
-              value={position.y}
-            />
-          </section>
+          <SettingsSection label="position">
+            <TextPosition position={position} onMoveX={moveX} onMoveY={moveY} />
+          </SettingsSection>
 
           <section>
-            <label className="block font-semibold text-1xl mb-2">
-              Perspective
-            </label>
-
-            <label htmlFor="rotateX" className="block text-sm mt-2">
-              {' '}
-              x-Rotation{' '}
-              <span className="text-xs text-gray-500">({rotation.x})</span>
-            </label>
-            <input
-              className="block"
-              type="range"
-              id="rotateX"
-              name="rotateX"
-              min="-180"
-              max="180"
-              onChange={rotateX}
-              value={rotation.x}
-            />
-            <label htmlFor="rotateY" className="block text-sm mt-2">
-              {' '}
-              y-Rotation{' '}
-              <span className="text-xs text-gray-500">({rotation.y})</span>
-            </label>
-            <input
-              className="block"
-              type="range"
-              id="rotateY"
-              name="rotateY"
-              min="-180"
-              max="180"
-              onChange={rotateY}
-              value={rotation.y}
-            />
-            <label htmlFor="rotateZ" className="block text-sm mt-2">
-              {' '}
-              z-Rotation{' '}
-              <span className="text-xs text-gray-500">({rotation.z})</span>
-            </label>
-            <input
-              className="block"
-              type="range"
-              id="rotateZ"
-              name="rotateZ"
-              min="-180"
-              max="180"
-              onChange={rotateZ}
-              value={rotation.z}
-            />
+            <SettingsSection label="Perspective">
+              <FontPerspective
+                onRotateX={rotateX}
+                onRotateY={rotateY}
+                onRotateZ={rotateZ}
+                rotation={rotation}
+              />
+            </SettingsSection>
           </section>
         </div>
       </aside>
