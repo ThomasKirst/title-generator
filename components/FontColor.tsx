@@ -4,16 +4,25 @@ interface Props {
   onChangeColor: (color: string) => void;
 }
 
-export default function TextColor({ onChangeColor }: Props) {
-  const backgroundColors: Colors = {
-    black: 'bg-black',
-    cyan: 'bg-cyan-500',
-    teal: 'bg-teal-500',
-    yellow: 'bg-yellow-500',
-    violet: 'bg-violet-500',
-    pink: 'bg-pink-800',
-  };
+export const textColors: Colors = {
+  black: 'text-black',
+  cyan: 'text-cyan-500',
+  teal: 'text-teal-500',
+  yellow: 'text-yellow-500',
+  violet: 'text-violet-500',
+  pink: 'text-pink-800',
+};
 
+const backgroundColors: Colors = {
+  black: 'bg-black',
+  cyan: 'bg-cyan-500',
+  teal: 'bg-teal-500',
+  yellow: 'bg-yellow-500',
+  violet: 'bg-violet-500',
+  pink: 'bg-pink-800',
+};
+
+export default function TextColor({ onChangeColor }: Props) {
   return (
     <div className="flex">
       {Object.keys(backgroundColors).map((color) => (

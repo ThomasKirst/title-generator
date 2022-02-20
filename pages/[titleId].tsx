@@ -3,12 +3,13 @@ import Create from '../components/Create';
 import useLocalStorage from '../hooks/useLocalStorage';
 import Title from '../types/Title';
 
-export default function EditTitle<NextPage>() {
+export default function EditTitle() {
   const router = useRouter();
   const { titleId } = router.query;
   const [titles] = useLocalStorage('titles', []);
 
   const title = titles.find((t: Title) => t.id === titleId);
+  console.log(title, 'Title ID');
   if (title) {
     return <Create initialTitle={title} />;
   } else {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
-import FontColor from '../components/FontColor';
+import FontColor, { textColors } from '../components/FontColor';
 import FontPerspective from '../components/FontPerspective';
 import FontSize from '../components/FontSize';
 import FontWeight from '../components/FontWeight';
@@ -9,16 +9,17 @@ import SettingsSection from '../components/SettingsSection';
 import TextBox from '../components/TextBox';
 import TextPosition from '../components/TextPosition';
 import TextShadow from '../components/TextShadow';
-import Colors from '../types/Colors';
 import Position from '../types/Position';
 import Rotation from '../types/Rotation';
 import Sizes from '../types/Sizes';
 import Weights from '../types/Weigths';
 import Title from '../types/Title';
 import useLocalStorage from '../hooks/useLocalStorage';
+import SelectTitle from './SelectTitle';
 
 export default function Create({ initialTitle }: { initialTitle?: Title }) {
   const [titles, saveTitleLocally] = useLocalStorage('titles', []);
+  const [showSelectTitle, setShowSelectTitle] = useState(false);
   const [message, setMessage] = useState('');
 
   const [position, setPosition] = useState<Position>({
@@ -32,17 +33,19 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     z: 0,
   });
 
-  const [title, setTitle] = useState<Title>(
-    initialTitle ?? {
-      id: nanoid(12),
-      text: '',
-      fontSize: 'L',
-      fontWeight: 'default',
-      fontColor: 'black',
-      position,
-      rotation,
-    }
-  );
+  const [title, setTitle] = useState<Title>({
+    id: nanoid(12),
+    text: '',
+    fontSize: 'L',
+    fontWeight: 'default',
+    fontColor: 'black',
+    position,
+    rotation,
+  });
+
+  useEffect(() => {
+    initialTitle && setTitle(initialTitle);
+  }, [initialTitle]);
 
   useEffect(() => {
     setTitle((title) => ({ ...title, position, rotation }));
@@ -65,15 +68,6 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     semibold: 'font-semibold',
     bold: 'font-bold',
     default: 'font-normal',
-  };
-
-  const textColors: Colors = {
-    black: 'text-black',
-    cyan: 'text-cyan-500',
-    teal: 'text-teal-500',
-    yellow: 'text-yellow-500',
-    violet: 'text-violet-500',
-    pink: 'text-pink-800',
   };
 
   const applyText = (event: SyntheticEvent) => {
@@ -144,7 +138,33 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   return (
     <div className="container mx-auto flex pt-4 pl-4 h-screen">
       <main className="flex-initial w-9/12 h-full">
-        <h1 className="text-3xl">Title Generator</h1>
+        <section className="flex items-baseline">
+          <h1 className="text-3xl basis-1/2">Title Generator</h1>
+          {titles && (
+            <div className="basis-1/4">
+              <p
+                className="cursor-pointer shadow-sm hover:shadow-md transition py-1 rounded-lg flex justify-center items-start"
+                onClick={() => setShowSelectTitle(!showSelectTitle)}
+              >
+                <span>Select existing</span>
+                <span
+                  className={`pl-1 leading-4 transition ${
+                    showSelectTitle
+                      ? '-rotate-180 translate-x-1 translate-y-2'
+                      : ''
+                  }`}
+                >
+                  ⌄
+                </span>
+              </p>
+            </div>
+          )}
+          {showSelectTitle && (
+            <div className="w-8/12 absolute mt-10 z-10">
+              <SelectTitle activeTitle={title} titles={titles} />
+            </div>
+          )}
+        </section>
         <section
           className="flex items-center justify-center h-full"
           style={{ perspective: '32rem' }}
