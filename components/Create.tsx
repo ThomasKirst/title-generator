@@ -17,7 +17,7 @@ import Weights from '../types/Weigths';
 import Title from '../types/Title';
 import useLocalStorage from '../hooks/useLocalStorage';
 
-export default function Create({ initialTitle }: { initialTitle: Title }) {
+export default function Create({ initialTitle }: { initialTitle?: Title }) {
   const [titles, saveTitleLocally] = useLocalStorage('titles', []);
   const [message, setMessage] = useState('');
 
