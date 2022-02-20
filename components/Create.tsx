@@ -16,9 +16,10 @@ import Weights from '../types/Weigths';
 import Title from '../types/Title';
 import useLocalStorage from '../hooks/useLocalStorage';
 import SelectTitle from './SelectTitle';
+import SelectTitleOpener from './SelectTitleOpener';
 
 export default function Create({ initialTitle }: { initialTitle?: Title }) {
-  const [titles, saveTitleLocally] = useLocalStorage('titles', []);
+  const [titles, saveTitlesLocally] = useLocalStorage('titles', []);
   const [showSelectTitle, setShowSelectTitle] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -36,11 +37,12 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   const [title, setTitle] = useState<Title>({
     id: nanoid(12),
     text: '',
+    fontColor: 'black',
     fontSize: 'L',
     fontWeight: 'default',
-    fontColor: 'black',
     position,
     rotation,
+    shadow: false,
   });
 
   useEffect(() => {
@@ -118,50 +120,48 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     );
   };
 
-  const saveTitle = () => {
-    const index = titles.findIndex((t: Title) => t.id === title.id);
+  const removeTitle = (event: SyntheticEvent, titleId: string) => {
+    event.stopPropagation();
+    event.preventDefault();
 
-    if (index > -1) {
-      titles[index] = title;
+    saveTitlesLocally(titles.filter((t: Title) => t.id !== titleId));
+  };
+
+  const saveTitle = () => {
+    if (titles.some((t: Title) => t.id === title.id)) {
+      saveTitlesLocally(
+        titles.map((t: Title) => (t.id === title.id ? title : t))
+      );
     } else {
-      titles.push(title);
+      saveTitlesLocally([...titles, title]);
     }
-    saveTitleLocally(titles);
     setMessage('Title has been saved with id: ' + title.id);
   };
 
   const titleOutputClasses = () =>
     `${sizes[title.fontSize]} ${textColors[title.fontColor]} ${
       fontWeights[title.fontWeight]
-    } transition-all transition-duration-75 ease-out`;
+    } transition-all transition-duration-75 ease-out whitespace-pre`;
 
   return (
     <div className="container mx-auto flex pt-4 pl-4 h-screen">
       <main className="flex-initial w-9/12 h-full">
         <section className="flex items-baseline">
           <h1 className="text-3xl basis-1/2">Title Generator</h1>
-          {titles && (
-            <div className="basis-1/4">
-              <p
-                className="cursor-pointer shadow-sm hover:shadow-md transition py-1 rounded-lg flex justify-center items-start"
-                onClick={() => setShowSelectTitle(!showSelectTitle)}
-              >
-                <span>Select existing</span>
-                <span
-                  className={`pl-1 leading-4 transition ${
-                    showSelectTitle
-                      ? '-rotate-180 translate-x-1 translate-y-2'
-                      : ''
-                  }`}
-                >
-                  ⌄
-                </span>
-              </p>
-            </div>
-          )}
+          <div className="basis-1/4">
+            <SelectTitleOpener
+              onSetShowSelectTitle={() => setShowSelectTitle(!showSelectTitle)}
+              showSelectTitle={showSelectTitle}
+              titles={titles}
+            />
+          </div>
           {showSelectTitle && (
             <div className="w-8/12 absolute mt-10 z-10">
-              <SelectTitle activeTitle={title} titles={titles} />
+              <SelectTitle
+                activeTitle={title}
+                onRemoveTitle={removeTitle}
+                titles={titles}
+              />
             </div>
           )}
         </section>
@@ -174,7 +174,6 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
             className={titleOutputClasses()}
             style={{
               transform: `translateX(${position.x}px) translateY(${position.y}px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`,
-              whiteSpace: 'pre',
             }}
           >
             {title.text}
@@ -185,7 +184,11 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
         <h2 className="text-2xl mt-2 mb-4">Settings</h2>
 
         <SettingsSection label="Text">
-          <TextBox inputField={inputField} onApplyText={applyText} />
+          <TextBox
+            inputField={inputField}
+            onApplyText={applyText}
+            text={title.text}
+          />
         </SettingsSection>
 
         <SettingsSection label="Font Settings">
