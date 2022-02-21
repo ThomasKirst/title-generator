@@ -11,7 +11,7 @@ export default function TextBox({ inputField, onApplyText, text }: Props) {
     <>
       <textarea
         ref={inputField}
-        className="block shadow-md rounded ring-1 my-4 p-4 text-lg"
+        className="block shadow-md rounded ring-1 my-4 px-2 py-2 text-lg w-5/6 h-28"
         defaultValue={text}
       ></textarea>
       <button

@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
-import FontColor, { textColors } from '../components/FontColor';
-import FontPerspective from '../components/FontPerspective';
-import FontSize from '../components/FontSize';
-import FontWeight from '../components/FontWeight';
-import SettingsSection from '../components/SettingsSection';
-import TextBox from '../components/TextBox';
-import TextPosition from '../components/TextPosition';
-import TextShadow from '../components/TextShadow';
+import FontColor, { textColors } from './Settings/FontColor';
+import FontPerspective from './Settings/FontPerspective';
+import FontSize from './Settings/FontSize';
+import FontWeight from './Settings/FontWeight';
+import SettingsSection from './Settings/SettingsSection';
+import TextBox from './Settings/TextBox';
+import TextPosition from './Settings/TextPosition';
+import TextShadow from './Settings/TextShadow';
 import Position from '../types/Position';
 import Rotation from '../types/Rotation';
 import Sizes from '../types/Sizes';
@@ -60,11 +60,15 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   }, [titles, saveTitlesLocally]);
 
   useEffect(() => {
-    initialTitle && setTitle(initialTitle);
+    if (initialTitle) {
+      setTitle(initialTitle);
+      setRotation((previousRotation) => initialTitle.rotation);
+      setPosition((previousPosition) => initialTitle.position);
+    }
   }, [initialTitle]);
 
   useEffect(() => {
-    setTitle((title) => ({ ...title, position, rotation }));
+    setTitle((previousTitle) => ({ ...previousTitle, position, rotation }));
   }, [position, rotation]);
 
   const inputField = useRef<HTMLTextAreaElement | null>(null);
@@ -74,7 +78,8 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     S: 'text-2xl',
     M: 'text-4xl',
     L: 'text-6xl',
-    XL: 'text-9xl',
+    XL: 'text-8xl',
+    XXL: 'text-9xl',
     default: 'text-6xl',
   };
 
@@ -126,21 +131,17 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
 
   const toggleShadow = (event: ChangeEvent<HTMLInputElement>) => {
     const shadow = event.target.checked;
-    titleOutput?.current?.style.setProperty(
-      'text-shadow',
-      shadow
-        ? '3px 3px 6px rgb(0 0 0 / 26%), 0 0 5px rgb(15 3 86 / 22%)'
-        : 'none'
-    );
+    setTitle({ ...title, shadow });
   };
 
-  const removeTitle = (event: SyntheticEvent, titleId: string) => {
+  const removeTitle = async (event: SyntheticEvent, titleId: string) => {
     event.preventDefault();
+
     setTitles(titles.filter((t: Title) => t.id !== titleId));
   };
 
   const postTitle = async (title: Title) => {
-    const response = await fetch('/api/titles', {
+    const response = await fetch('/api/titles/', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -151,23 +152,38 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     setTitles([...titles, newTitle]);
   };
 
+  const updateTitle = async (title: Title) => {
+    const response = await fetch('/api/titles/' + title.id, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(title),
+    });
+    const responseMessage = await response.json();
+    if (responseMessage.success) {
+      setTitles(titles.map((t: Title) => (t.id === title.id ? title : t)));
+    }
+  };
+
   const saveTitle = () => {
     if (titles.some((t: Title) => t.id === title.id)) {
-      setTitles(titles.map((t: Title) => (t.id === title.id ? title : t)));
+      updateTitle(title);
+      setMessage('Title has been updated with id: ' + title.id);
     } else {
       postTitle(title);
+      setMessage('Title has been saved with id: ' + title.id);
     }
-    setMessage('Title has been saved with id: ' + title.id);
   };
 
   const titleOutputClasses = () =>
     `${sizes[title.fontSize]} ${textColors[title.fontColor]} ${
       fontWeights[title.fontWeight]
-    } transition-all transition-duration-75 ease-out whitespace-pre`;
+    } transition-all transition-duration-75 ease-out pointer-events-none whitespace-pre`;
 
   return (
     <div className="container mx-auto flex pt-4 pl-4 h-screen">
-      <main className="flex-initial w-9/12 h-full">
+      <main className="flex-initial w-10/12 h-full">
         <section className="flex items-baseline">
           <h1 className="text-3xl basis-1/2">Title Generator</h1>
           <div className="basis-1/4">
@@ -196,13 +212,16 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
             className={titleOutputClasses()}
             style={{
               transform: `translateX(${position.x}px) translateY(${position.y}px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`,
+              textShadow: title.shadow
+                ? '3px 3px 6px rgb(0 0 0 / 26%), 0 0 5px rgb(15 3 86 / 22%)'
+                : 'none',
             }}
           >
             {title.text}
           </h2>
         </section>
       </main>
-      <aside className="flex-none w-3/12">
+      <aside className="flex-none w-2/12">
         <h2 className="text-2xl mt-2 mb-4">Settings</h2>
 
         <SettingsSection label="Text">
@@ -214,7 +233,11 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
         </SettingsSection>
 
         <SettingsSection label="Font Settings">
-          <FontSize onIncreaseSize={increaseSize} text={title.text} />
+          <FontSize
+            onIncreaseSize={increaseSize}
+            sizes={sizes}
+            text={title.text}
+          />
         </SettingsSection>
 
         <SettingsSection label="Font Weight">

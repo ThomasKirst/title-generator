@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { SyntheticEvent } from 'react';
 import Title from '../types/Title';
-import { textColors } from './FontColor';
+import { textColors } from './Settings/FontColor';
 
 export default function SelectTitle({
   activeTitle,
@@ -29,7 +29,7 @@ export default function SelectTitle({
               >
                 <p
                   className={
-                    textColors[title.fontColor] + ' pb-1 whitespace-pre'
+                    textColors[title.fontColor] + ' text-xs pb-1 whitespace-pre'
                   }
                 >
                   {title.text}

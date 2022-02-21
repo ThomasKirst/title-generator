@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import Position from '../types/Position';
+import Position from '../../types/Position';
 
 interface Props {
   position: Position;
@@ -19,8 +19,8 @@ export default function TextPosition({ onMoveX, onMoveY, position }: Props) {
         type="range"
         id="xpos"
         name="xpos"
-        min="-400"
-        max="400"
+        min="-600"
+        max="600"
         onChange={onMoveX}
         value={position.x}
       />
@@ -33,8 +33,8 @@ export default function TextPosition({ onMoveX, onMoveY, position }: Props) {
         type="range"
         id="ypos"
         name="ypos"
-        min="-400"
-        max="400"
+        min="-600"
+        max="600"
         onChange={onMoveY}
         value={position.y}
       />

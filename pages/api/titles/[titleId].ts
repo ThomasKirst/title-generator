@@ -28,13 +28,13 @@ export default async function handler(
       res.status(200).json(title);
       break;
     case 'PUT':
-      const updatedTitle = await db
+      await db
         .collection('titles')
-        .updateOne({ _id: titleId }, req.body);
-      res.status(200).json({ message: 'Updated title' });
+        .findOneAndReplace({ _id: titleId }, req.body);
+      res.status(200).json({ success: true, message: 'Updated title' });
       break;
     case 'DELETE':
-      const result = await db.collection('title').deleteOne({ _id: titleId });
-      res.status(200).json({ message: 'Deleted title' });
+      await db.collection('title').deleteOne({ _id: titleId });
+      res.status(200).json({ success: true, message: 'Deleted title' });
   }
 }

@@ -9,5 +9,5 @@ export default interface Title {
   fontWeight: string;
   position: Position;
   rotation: Rotation;
-  shadow: false;
+  shadow: boolean;
 }
