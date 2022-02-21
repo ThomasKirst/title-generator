@@ -1,7 +1,17 @@
+import Weights from '../../types/Weigths';
+
 interface Props {
   onChangeFontWeight: (weight: string) => void;
   text: string;
 }
+
+export const fontWeights: Weights = {
+  thin: 'font-light',
+  normal: 'font-normal',
+  semibold: 'font-semibold',
+  bold: 'font-bold',
+  default: 'font-normal',
+};
 
 export default function FontWeight({ onChangeFontWeight, text = '' }: Props) {
   return (

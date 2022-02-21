@@ -1,26 +1,33 @@
 import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
+
+import Position from '../types/Position';
+import Rotation from '../types/Rotation';
+import Title from '../types/Title';
+
 import FontColor, { textColors } from './Settings/FontColor';
 import FontPerspective from './Settings/FontPerspective';
-import FontSize from './Settings/FontSize';
-import FontWeight from './Settings/FontWeight';
+import FontSize, { sizes } from './Settings/FontSize';
+import FontWeight, { fontWeights } from './Settings/FontWeight';
 import SettingsSection from './Settings/SettingsSection';
 import TextBox from './Settings/TextBox';
 import TextPosition from './Settings/TextPosition';
 import TextShadow from './Settings/TextShadow';
-import Position from '../types/Position';
-import Rotation from '../types/Rotation';
-import Sizes from '../types/Sizes';
-import Weights from '../types/Weigths';
-import Title from '../types/Title';
-import useLocalStorage from '../hooks/useLocalStorage';
+
 import SelectTitle from './SelectTitle';
 import SelectTitleOpener from './SelectTitleOpener';
 
+import useLocalStorage from '../hooks/useLocalStorage';
+
+import { moveX, moveY } from '../lib/move';
+import { rotateX, rotateY, rotateZ } from '../lib/rotate';
+
+import { fetchTitles, postTitle, updateTitle, removeTitle } from '../lib/api';
+
 export default function Create({ initialTitle }: { initialTitle?: Title }) {
   const [titles, setTitles] = useState<Title[]>([]);
-  const [titlesSavedLocally, saveTitlesLocally] = useLocalStorage('titles', []);
+  const [_, saveTitlesLocally] = useLocalStorage('titles', []);
   const [showSelectTitle, setShowSelectTitle] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -47,12 +54,7 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   });
 
   useEffect(() => {
-    const fetchTitles = async () => {
-      const response = await fetch('/api/titles');
-      const titles = await response.json();
-      setTitles(titles);
-    };
-    fetchTitles();
+    fetchTitles(setTitles);
   }, []);
 
   useEffect(() => {
@@ -73,23 +75,6 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
 
   const inputField = useRef<HTMLTextAreaElement | null>(null);
   const titleOutput = useRef<HTMLHeadingElement | null>(null);
-
-  const sizes: Sizes = {
-    S: 'text-2xl',
-    M: 'text-4xl',
-    L: 'text-6xl',
-    XL: 'text-8xl',
-    XXL: 'text-9xl',
-    default: 'text-6xl',
-  };
-
-  const fontWeights: Weights = {
-    thin: 'font-light',
-    normal: 'font-normal',
-    semibold: 'font-semibold',
-    bold: 'font-bold',
-    default: 'font-normal',
-  };
 
   const applyText = (event: SyntheticEvent) => {
     if (inputField && inputField.current) {
@@ -112,66 +97,17 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   const changeColor = (color: string) =>
     setTitle({ ...title, fontColor: color });
 
-  const moveX = (event: ChangeEvent<HTMLInputElement>) => {
-    const xPos = event.currentTarget.value;
-    setPosition({ ...position, x: parseInt(xPos) });
-  };
-
-  const moveY = (event: ChangeEvent<HTMLInputElement>) => {
-    const yPos = event.currentTarget.value;
-    setPosition({ ...position, y: parseInt(yPos) });
-  };
-
-  const rotateX = (event: ChangeEvent<HTMLInputElement>) =>
-    setRotation({ ...rotation, x: parseInt(event.currentTarget.value) });
-  const rotateY = (event: ChangeEvent<HTMLInputElement>) =>
-    setRotation({ ...rotation, y: parseInt(event.currentTarget.value) });
-  const rotateZ = (event: ChangeEvent<HTMLInputElement>) =>
-    setRotation({ ...rotation, z: parseInt(event.currentTarget.value) });
-
   const toggleShadow = (event: ChangeEvent<HTMLInputElement>) => {
     const shadow = event.target.checked;
     setTitle({ ...title, shadow });
   };
 
-  const removeTitle = async (event: SyntheticEvent, titleId: string) => {
-    event.preventDefault();
-
-    setTitles(titles.filter((t: Title) => t.id !== titleId));
-  };
-
-  const postTitle = async (title: Title) => {
-    const response = await fetch('/api/titles/', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(title),
-    });
-    const newTitle = await response.json();
-    setTitles([...titles, newTitle]);
-  };
-
-  const updateTitle = async (title: Title) => {
-    const response = await fetch('/api/titles/' + title.id, {
-      method: 'PUT',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(title),
-    });
-    const responseMessage = await response.json();
-    if (responseMessage.success) {
-      setTitles(titles.map((t: Title) => (t.id === title.id ? title : t)));
-    }
-  };
-
   const saveTitle = () => {
     if (titles.some((t: Title) => t.id === title.id)) {
-      updateTitle(title);
+      updateTitle(title, setTitles);
       setMessage('Title has been updated with id: ' + title.id);
     } else {
-      postTitle(title);
+      postTitle(title, setTitles);
       setMessage('Title has been saved with id: ' + title.id);
     }
   };
@@ -197,7 +133,9 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
             <div className="w-8/12 absolute mt-10 z-10">
               <SelectTitle
                 activeTitle={title}
-                onRemoveTitle={removeTitle}
+                onRemoveTitle={(event) =>
+                  removeTitle(event, title.id, setTitles)
+                }
                 titles={titles}
               />
             </div>
@@ -254,15 +192,19 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
 
         <div className="flex gap-6">
           <SettingsSection label="position">
-            <TextPosition position={position} onMoveX={moveX} onMoveY={moveY} />
+            <TextPosition
+              position={position}
+              onMoveX={(event) => moveX(event, setPosition)}
+              onMoveY={(event) => moveY(event, setPosition)}
+            />
           </SettingsSection>
 
           <section>
             <SettingsSection label="Perspective">
               <FontPerspective
-                onRotateX={rotateX}
-                onRotateY={rotateY}
-                onRotateZ={rotateZ}
+                onRotateX={(event) => rotateX(event, setRotation)}
+                onRotateY={(event) => rotateY(event, setRotation)}
+                onRotateZ={(event) => rotateZ(event, setRotation)}
                 rotation={rotation}
               />
             </SettingsSection>

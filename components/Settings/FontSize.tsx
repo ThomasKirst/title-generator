@@ -6,7 +6,16 @@ interface Props {
   sizes: Sizes;
 }
 
-export default function FontSize({ onIncreaseSize, sizes, text = '' }: Props) {
+export const sizes: Sizes = {
+  S: 'text-2xl',
+  M: 'text-4xl',
+  L: 'text-6xl',
+  XL: 'text-8xl',
+  XXL: 'text-9xl',
+  default: 'text-6xl',
+};
+
+export default function FontSize({ onIncreaseSize, text = '' }: Props) {
   return (
     <div className="flex">
       {Object.keys(sizes)
