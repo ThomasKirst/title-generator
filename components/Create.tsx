@@ -118,11 +118,11 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     } transition-all transition-duration-75 ease-out pointer-events-none whitespace-pre`;
 
   return (
-    <div className="container mx-auto flex pt-4 pl-4 h-screen">
+    <div className="container mx-auto flex pt-4 px-4 h-screen">
       <main className="flex-initial w-10/12 h-full">
         <section className="flex items-baseline">
           <h1 className="text-3xl basis-1/2">Title Generator</h1>
-          <div className="basis-1/4">
+          <div className="basis-1/5">
             <SelectTitleOpener
               onSetShowSelectTitle={() => setShowSelectTitle(!showSelectTitle)}
               showSelectTitle={showSelectTitle}
@@ -130,7 +130,7 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
             />
           </div>
           {showSelectTitle && (
-            <div className="w-8/12 absolute mt-10 z-10">
+            <div className="container absolute flex flex-col items-center mt-10 z-10 pr-8">
               <SelectTitle
                 activeTitle={title}
                 onRemoveTitle={(event) =>

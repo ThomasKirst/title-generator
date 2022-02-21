@@ -12,16 +12,15 @@ export default function SelectTitle({
   onRemoveTitle: (event: SyntheticEvent, titleId: string) => void;
   titles: Title[];
 }) {
-  console.log(titles);
   return (
-    <>
-      <h2 className="text-2xl mt-2 mb-3">Your title creations</h2>
+    <div className="w-1/2 mx-auto flex flex-col items-center">
+      <h2 className="text-2xl mt-4 mb-3">Your title creations</h2>
       <section className="flex flex-wrap gap-3">
         {(titles as Title[]).map((title) => (
           <Link key={title.id} href={'/' + title.id}>
             <a className="relative">
               <article
-                className={`flex justify-center items-center group border-2 border-solid rounded-lg border-indigo-300/50 hover:bg-indigo-200/10 cursor-pointer shadow-md w-32 h-24 hover:scale-105 transition ease-in-out ${
+                className={`flex justify-center items-center group border-2 border-solid rounded-lg border-indigo-300/50 hover:bg-indigo-200/10 cursor-pointer shadow-md w-40 h-32 hover:scale-105 transition ease-in-out ${
                   activeTitle && activeTitle.id === title.id
                     ? 'outline outline-offset-2 outline-2 outline-indigo-300/75'
                     : ''
@@ -29,7 +28,7 @@ export default function SelectTitle({
               >
                 <p
                   className={
-                    textColors[title.fontColor] + ' text-xs pb-1 whitespace-pre'
+                    textColors[title.fontColor] + ' text-sm pb-1 whitespace-pre'
                   }
                 >
                   {title.text}
@@ -46,12 +45,12 @@ export default function SelectTitle({
         ))}
         <Link href="/">
           <a>
-            <article className="flex justify-center items-center border-2 border-solid rounded-lg border-indigo-300/50 hover:bg-indigo-200/10 cursor-pointer shadow-md w-32 h-24 hover:scale-105 transition ease-in-out">
+            <article className="flex justify-center items-center border-2 border-solid rounded-lg border-indigo-300/50 hover:bg-indigo-200/10 cursor-pointer shadow-md w-40 h-32 hover:scale-105 transition ease-in-out">
               <p className="text-gray-300 text-4xl pb-2">+</p>
             </article>
           </a>
         </Link>
       </section>
-    </>
+    </div>
   );
 }
