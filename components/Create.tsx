@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
@@ -23,13 +24,15 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import { moveX, moveY } from '../lib/move';
 import { rotateX, rotateY, rotateZ } from '../lib/rotate';
 
-import { fetchTitles, postTitle, updateTitle, removeTitle } from '../lib/api';
+import { fetchTitles, postTitle, updateTitle, deleteTitle } from '../lib/api';
 
 export default function Create({ initialTitle }: { initialTitle?: Title }) {
   const [titles, setTitles] = useState<Title[]>([]);
-  const [_, saveTitlesLocally] = useLocalStorage('titles', []);
+  const [titlesLocallySaved, saveTitlesLocally] = useLocalStorage('titles', []);
   const [showSelectTitle, setShowSelectTitle] = useState(false);
   const [message, setMessage] = useState('');
+
+  const router = useRouter();
 
   const [position, setPosition] = useState<Position>({
     x: 0,
@@ -64,8 +67,8 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   useEffect(() => {
     if (initialTitle) {
       setTitle(initialTitle);
-      setRotation((previousRotation) => initialTitle.rotation);
-      setPosition((previousPosition) => initialTitle.position);
+      setRotation(initialTitle.rotation);
+      setPosition(initialTitle.position);
     }
   }, [initialTitle]);
 
@@ -102,14 +105,20 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     setTitle({ ...title, shadow });
   };
 
-  const saveTitle = () => {
+  const saveTitle = async () => {
     if (titles.some((t: Title) => t.id === title.id)) {
-      updateTitle(title, setTitles);
+      await updateTitle(title, setTitles);
       setMessage('Title has been updated with id: ' + title.id);
     } else {
-      postTitle(title, setTitles);
+      await postTitle(title, setTitles);
       setMessage('Title has been saved with id: ' + title.id);
+      router.push('/' + title.id);
     }
+  };
+
+  const removeTitle = async (titleId: string) => {
+    await deleteTitle(titleId, setTitles);
+    router.push('/');
   };
 
   const titleOutputClasses = () =>
@@ -129,17 +138,21 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
               titles={titles}
             />
           </div>
-          {showSelectTitle && (
-            <div className="container absolute  mt-10 z-10 pr-8">
-              <SelectTitle
-                activeTitle={title}
-                onRemoveTitle={(event) =>
-                  removeTitle(event, title.id, setTitles)
-                }
-                titles={titles}
-              />
-            </div>
-          )}
+          <div
+            className={`container absolute  mt-10 z-10 pr-8 transition ${
+              showSelectTitle
+                ? 'opacity-100'
+                : 'opacity-0 max-h-0 overflow-hidden'
+            }`}
+          >
+            <SelectTitle
+              activeTitle={title}
+              hideSelection={() => setShowSelectTitle(false)}
+              textEntry={inputField}
+              onRemoveTitle={removeTitle}
+              titles={titlesLocallySaved}
+            />
+          </div>
         </section>
         <section
           className="flex items-center justify-center h-full"

@@ -1,17 +1,30 @@
 import Link from 'next/link';
-import { SyntheticEvent } from 'react';
+import { MutableRefObject, useEffect } from 'react';
 import Title from '../types/Title';
 import { textColors } from './Settings/FontColor';
 
+interface Props {
+  activeTitle?: Title;
+  hideSelection: Function;
+  textEntry?: MutableRefObject<HTMLTextAreaElement | null>;
+  onRemoveTitle: (titleId: string) => void;
+  titles: Title[];
+}
+
 export default function SelectTitle({
   activeTitle,
+  hideSelection,
+  textEntry,
   onRemoveTitle,
   titles,
-}: {
-  activeTitle?: Title;
-  onRemoveTitle: (event: SyntheticEvent, titleId: string) => void;
-  titles: Title[];
-}) {
+}: Props) {
+  const createNew = () => {
+    if (textEntry && textEntry.current) {
+      textEntry.current.focus();
+    }
+    hideSelection();
+  };
+
   return (
     <div className="w-1/2 mx-auto flex flex-col items-center">
       <h2 className="text-2xl mt-4 mb-3">Your title creations</h2>
@@ -34,7 +47,7 @@ export default function SelectTitle({
                   {title.text}
                 </p>
                 <span
-                  onClick={(event) => onRemoveTitle(event, title.id)}
+                  onClick={() => onRemoveTitle(title.id)}
                   className="absolute bottom-2 right-0 transition duration-250 opacity-0 group-hover:opacity-100 w-5 h-5 text-gray-600"
                 >
                   &times;
@@ -43,8 +56,8 @@ export default function SelectTitle({
             </a>
           </Link>
         ))}
-        <Link href="/">
-          <a>
+        <Link href="/" key="new">
+          <a onClick={createNew}>
             <article className="flex justify-center items-center border-2 border-solid rounded-lg border-indigo-300/50 hover:bg-indigo-200/10 cursor-pointer shadow-md w-40 h-32 hover:scale-105 transition ease-in-out">
               <p className="text-gray-300 text-4xl pb-2">+</p>
             </article>

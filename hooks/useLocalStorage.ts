@@ -1,24 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+type LocalStorageItem = [] | object | string;
 
 export default function useLocalStorage(
   key: string,
-  initialValue: [] | object | string
+  initialValue: LocalStorageItem
 ) {
-  const isBrowser: boolean = ((): boolean => typeof window !== 'undefined')();
+  const [storedValue, setStoredValue] =
+    useState<LocalStorageItem>(initialValue);
 
-  const [storedValue, setStoredValue] = useState(() => {
-    try {
-      if (!isBrowser) return initialValue;
+  useEffect(() => {
+    setStoredValue((key: string) => {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : initialValue;
+      } catch (error) {
+        console.log(error);
+        return initialValue;
+      }
+    });
+  }, [key, initialValue]);
 
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.log(error);
-      return initialValue;
-    }
-  });
-
-  const setValue = (value: [] | object | string) => {
+  const setValue = (value: any) => {
     try {
       setStoredValue(value);
       localStorage.setItem(key, JSON.stringify(value));

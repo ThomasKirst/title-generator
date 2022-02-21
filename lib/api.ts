@@ -37,12 +37,7 @@ const updateTitle = async (title: Title, setTitles: StateUpdate) => {
   }
 };
 
-const removeTitle = async (
-  event: SyntheticEvent,
-  titleId: string,
-  setTitles: StateUpdate
-) => {
-  event.preventDefault();
+const deleteTitle = async (titleId: string, setTitles: StateUpdate) => {
   const response = await fetch('/api/titles/' + titleId, {
     method: 'DELETE',
   });
@@ -54,4 +49,4 @@ const removeTitle = async (
   }
 };
 
-export { fetchTitles, postTitle, updateTitle, removeTitle };
+export { fetchTitles, postTitle, updateTitle, deleteTitle };
