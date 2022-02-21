@@ -10,7 +10,6 @@ export default function Select() {
   useEffect(() => setTitles(titlesLocallySaved), [titlesLocallySaved]);
 
   const removeTitle = (event: SyntheticEvent, titleId: string) => {
-    event.stopPropagation();
     event.preventDefault();
     saveTitlesLocally(titles.filter((t: Title) => t.id !== titleId));
   };

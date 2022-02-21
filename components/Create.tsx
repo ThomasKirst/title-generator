@@ -19,7 +19,8 @@ import SelectTitle from './SelectTitle';
 import SelectTitleOpener from './SelectTitleOpener';
 
 export default function Create({ initialTitle }: { initialTitle?: Title }) {
-  const [titles, saveTitlesLocally] = useLocalStorage('titles', []);
+  const [titles, setTitles] = useState<Title[]>([]);
+  const [titlesSavedLocally, saveTitlesLocally] = useLocalStorage('titles', []);
   const [showSelectTitle, setShowSelectTitle] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -44,6 +45,19 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
     rotation,
     shadow: false,
   });
+
+  useEffect(() => {
+    const fetchTitles = async () => {
+      const response = await fetch('/api/titles');
+      const titles = await response.json();
+      setTitles(titles);
+    };
+    fetchTitles();
+  }, []);
+
+  useEffect(() => {
+    saveTitlesLocally(titles);
+  }, [titles, saveTitlesLocally]);
 
   useEffect(() => {
     initialTitle && setTitle(initialTitle);
@@ -121,19 +135,27 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   };
 
   const removeTitle = (event: SyntheticEvent, titleId: string) => {
-    event.stopPropagation();
     event.preventDefault();
+    setTitles(titles.filter((t: Title) => t.id !== titleId));
+  };
 
-    saveTitlesLocally(titles.filter((t: Title) => t.id !== titleId));
+  const postTitle = async (title: Title) => {
+    const response = await fetch('/api/titles', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(title),
+    });
+    const newTitle = await response.json();
+    setTitles([...titles, newTitle]);
   };
 
   const saveTitle = () => {
     if (titles.some((t: Title) => t.id === title.id)) {
-      saveTitlesLocally(
-        titles.map((t: Title) => (t.id === title.id ? title : t))
-      );
+      setTitles(titles.map((t: Title) => (t.id === title.id ? title : t)));
     } else {
-      saveTitlesLocally([...titles, title]);
+      postTitle(title);
     }
     setMessage('Title has been saved with id: ' + title.id);
   };
