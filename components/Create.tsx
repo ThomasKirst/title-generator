@@ -130,7 +130,7 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
             />
           </div>
           {showSelectTitle && (
-            <div className="container absolute flex flex-col items-center mt-10 z-10 pr-8">
+            <div className="container absolute  mt-10 z-10 pr-8">
               <SelectTitle
                 activeTitle={title}
                 onRemoveTitle={(event) =>
