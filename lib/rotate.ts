@@ -4,22 +4,28 @@ import Rotation from '../types/Rotation';
 type RotateEvent = ChangeEvent<HTMLInputElement>;
 type StateUpdate = (value: SetStateAction<Rotation>) => void;
 
-const rotateX = (event: RotateEvent, setRotation: StateUpdate) =>
+const rotateX = (event: RotateEvent, setRotation: StateUpdate) => {
+  const x = event.currentTarget.value;
   setRotation((previousRotation) => ({
     ...previousRotation,
-    x: parseInt(event.currentTarget.value),
+    x: parseInt(x),
   }));
+};
 
-const rotateY = (event: RotateEvent, setRotation: StateUpdate) =>
+const rotateY = (event: RotateEvent, setRotation: StateUpdate) => {
+  const y = event.currentTarget.value;
   setRotation((previousRotation) => ({
     ...previousRotation,
-    y: parseInt(event.currentTarget.value),
+    y: parseInt(y),
   }));
+};
 
-const rotateZ = (event: RotateEvent, setRotation: StateUpdate) =>
+const rotateZ = (event: RotateEvent, setRotation: StateUpdate) => {
+  const z = event.currentTarget.value;
   setRotation((previousRotation) => ({
     ...previousRotation,
-    z: parseInt(event.currentTarget.value),
+    z: parseInt(z),
   }));
+};
 
 export { rotateX, rotateY, rotateZ };
