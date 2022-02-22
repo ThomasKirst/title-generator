@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import Rotation from '../types/Rotation';
+import Rotation from '../../types/Rotation';
 
 interface Props {
   onRotateX: (event: ChangeEvent<HTMLInputElement>) => void;

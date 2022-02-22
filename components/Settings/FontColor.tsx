@@ -1,4 +1,4 @@
-import Colors from '../types/Colors';
+import Colors from '../../types/Colors';
 
 interface Props {
   onChangeColor: (color: string) => void;
