@@ -24,11 +24,15 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import { moveX, moveY } from '../lib/move';
 import { rotateX, rotateY, rotateZ } from '../lib/rotate';
 
-import { fetchTitles, postTitle, updateTitle, deleteTitle } from '../lib/api';
+import { postTitle, updateTitle, deleteTitle } from '../lib/api';
 
-export default function Create({ initialTitle }: { initialTitle?: Title }) {
-  const [titles, setTitles] = useState<Title[]>([]);
-  const [titlesLocallySaved, saveTitlesLocally] = useLocalStorage('titles', []);
+interface Props {
+  initialTitle?: Title;
+}
+
+export default function Create({ initialTitle }: Props) {
+  const [titles, setTitles] = useLocalStorage<Title[]>('titles', []);
+  const [selectTitles, setSelectTitles] = useState<Title[]>([]);
   const [showSelectTitle, setShowSelectTitle] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -57,14 +61,6 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   });
 
   useEffect(() => {
-    fetchTitles(setTitles);
-  }, []);
-
-  useEffect(() => {
-    saveTitlesLocally(titles);
-  }, [titles, saveTitlesLocally]);
-
-  useEffect(() => {
     if (initialTitle) {
       setTitle(initialTitle);
       setRotation(initialTitle.rotation);
@@ -75,6 +71,10 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   useEffect(() => {
     setTitle((previousTitle) => ({ ...previousTitle, position, rotation }));
   }, [position, rotation]);
+
+  useEffect(() => {
+    setSelectTitles(titles);
+  }, [titles]);
 
   const inputField = useRef<HTMLTextAreaElement | null>(null);
   const titleOutput = useRef<HTMLHeadingElement | null>(null);
@@ -106,7 +106,7 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
   };
 
   const saveTitle = async () => {
-    if (titles.some((t: Title) => t.id === title.id)) {
+    if (initialTitle && initialTitle.id) {
       await updateTitle(title, setTitles);
       setMessage('Title has been updated with id: ' + title.id);
     } else {
@@ -135,11 +135,11 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
             <SelectTitleOpener
               onSetShowSelectTitle={() => setShowSelectTitle(!showSelectTitle)}
               showSelectTitle={showSelectTitle}
-              titles={titles}
+              titles={selectTitles}
             />
           </div>
           <div
-            className={`container absolute  mt-10 z-10 pr-8 transition ${
+            className={`container absolute mt-10 z-10 pr-8 transition ${
               showSelectTitle
                 ? 'opacity-100'
                 : 'opacity-0 max-h-0 overflow-hidden'
@@ -150,7 +150,7 @@ export default function Create({ initialTitle }: { initialTitle?: Title }) {
               hideSelection={() => setShowSelectTitle(false)}
               textEntry={inputField}
               onRemoveTitle={removeTitle}
-              titles={titlesLocallySaved}
+              titles={selectTitles}
             />
           </div>
         </section>

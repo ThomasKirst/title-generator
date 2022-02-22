@@ -5,7 +5,7 @@ import { textColors } from './Settings/FontColor';
 
 interface Props {
   activeTitle?: Title;
-  hideSelection: Function;
+  hideSelection?: Function;
   textEntry?: MutableRefObject<HTMLTextAreaElement | null>;
   onRemoveTitle: (titleId: string) => void;
   titles: Title[];
@@ -18,11 +18,13 @@ export default function SelectTitle({
   onRemoveTitle,
   titles,
 }: Props) {
+  if (titles.length === 0) return null;
+
   const createNew = () => {
     if (textEntry && textEntry.current) {
       textEntry.current.focus();
     }
-    hideSelection();
+    hideSelection && hideSelection();
   };
 
   return (

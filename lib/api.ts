@@ -1,15 +1,16 @@
-import { SetStateAction, SyntheticEvent } from 'react';
+import { Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import Title from '../types/Title';
 
-type StateUpdate = (value: SetStateAction<Title[]>) => void;
+type SetValue<T> = Dispatch<SetStateAction<T>>;
 
-const fetchTitles = async (setTitles: StateUpdate) => {
-  const response = await fetch('/api/titles');
-  const titles = await response.json();
-  setTitles(titles);
+// Prepared for later when registered users are present
+const fetchTitles = async (setTitles: SetValue<Title[]>) => {
+  // const response = await fetch('/api/titles');
+  // const titles = await response.json();
+  // setTitles(titles);
 };
 
-const postTitle = async (title: Title, setTitles: StateUpdate) => {
+const postTitle = async (title: Title, setTitles: SetValue<Title[]>) => {
   const response = await fetch('/api/titles/', {
     method: 'POST',
     headers: {
@@ -21,7 +22,7 @@ const postTitle = async (title: Title, setTitles: StateUpdate) => {
   setTitles((previousTitles) => [...previousTitles, newTitle]);
 };
 
-const updateTitle = async (title: Title, setTitles: StateUpdate) => {
+const updateTitle = async (title: Title, setTitles: SetValue<Title[]>) => {
   const response = await fetch('/api/titles/' + title.id, {
     method: 'PUT',
     headers: {
@@ -37,7 +38,7 @@ const updateTitle = async (title: Title, setTitles: StateUpdate) => {
   }
 };
 
-const deleteTitle = async (titleId: string, setTitles: StateUpdate) => {
+const deleteTitle = async (titleId: string, setTitles: SetValue<Title[]>) => {
   const response = await fetch('/api/titles/' + titleId, {
     method: 'DELETE',
   });

@@ -1,14 +1,12 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Create from '../components/Create';
-import useLocalStorage from '../hooks/useLocalStorage';
 import Title from '../types/Title';
 
 export default function EditTitle() {
   const router = useRouter();
   const { titleId } = router.query;
   const [initialTitle, setInitialTitle] = useState<Title | null>(null);
-  const [titlesSavedLocally] = useLocalStorage('titles', []);
 
   useEffect(() => {
     const fetchTitle = async (titleId: string) => {
@@ -16,9 +14,11 @@ export default function EditTitle() {
       const title = await response.json();
       setInitialTitle(title);
     };
-    setInitialTitle(titlesSavedLocally.find((t: Title) => t.id === titleId));
-    titleId && typeof titleId === 'string' && fetchTitle(titleId);
-  }, [titleId, titlesSavedLocally]);
+
+    if (titleId && typeof titleId === 'string') {
+      fetchTitle(titleId);
+    }
+  }, [titleId]);
 
   if (initialTitle) {
     return <Create initialTitle={initialTitle} />;

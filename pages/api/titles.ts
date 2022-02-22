@@ -30,11 +30,15 @@ export default async function handler(
       break;
     }
     case 'GET': {
+      // TODO: make this user dependent
+      /*
       let titles = (await db
         .collection('titles')
         .find()
         .toArray()) as DbTitle[];
       res.status(200).json(titles);
+      */
+      res.status(404).json({ message: 'Nothing to see here' });
     }
   }
 }
