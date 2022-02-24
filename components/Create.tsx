@@ -204,7 +204,10 @@ export default function Create({ initialTitle }: Props) {
         </SettingsSection>
 
         <SettingsSection label="Color">
-          <FontColor onChangeColor={changeColor} />
+          <FontColor
+            onChangeColor={changeColor}
+            currentFontColor={title.fontColor}
+          />
         </SettingsSection>
 
         <SettingsSection label="Shadow">

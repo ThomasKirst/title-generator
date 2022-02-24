@@ -8,6 +8,7 @@ interface Props {
 export const fontWeights: Weights = {
   thin: 'font-light',
   normal: 'font-normal',
+  medium: 'font-medium',
   semibold: 'font-semibold',
   bold: 'font-bold',
   default: 'font-normal',
@@ -16,7 +17,7 @@ export const fontWeights: Weights = {
 export default function FontWeight({ onChangeFontWeight, text = '' }: Props) {
   return (
     <div className="flex">
-      {['thin', 'normal', 'semibold', 'bold'].map((weight) => (
+      {['thin', 'normal', 'medium', 'bold'].map((weight) => (
         <button
           key={weight}
           onClick={() => onChangeFontWeight(weight)}

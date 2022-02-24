@@ -23,10 +23,17 @@ export default async function handler(
 
   switch (method) {
     case 'GET':
-      const title = (await db
-        .collection(titlesCollection)
-        .findOne({ _id: titleId })) as DbTitle;
-      res.status(200).json(title);
+      try {
+        const title = (await db
+          .collection(titlesCollection)
+          .findOne({ _id: titleId })) as DbTitle;
+        if (!title) {
+          throw new Error(`Title with id ${titleId} could not be found`);
+        }
+        res.status(200).json(title);
+      } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+      }
       break;
     case 'PUT':
       await db

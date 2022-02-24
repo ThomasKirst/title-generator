@@ -25,16 +25,32 @@ export async function getServerSideProps(context: Context) {
   }
 
   const fetchTitle = async (titleId: string) => {
-    const response = await fetch(
-      process.env.APP_URL + '/api/titles/' + titleId
-    );
-    const title = await response.json();
-    return title;
+    try {
+      const response = await fetch(
+        process.env.APP_URL + '/api/titles/' + titleId
+      );
+      const title = await response.json();
+      if (!title.id) return;
+      return title;
+    } catch (error: any) {
+      console.warn(error.message);
+    }
   };
+
+  const initialTitle = await fetchTitle(titleId);
+
+  if (!initialTitle) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
-      initialTitle: titleId ? await fetchTitle(titleId) : null,
+      initialTitle: initialTitle,
     }, // will be passed to the page component as props
   };
 }

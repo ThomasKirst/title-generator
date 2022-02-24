@@ -10,7 +10,7 @@ export default function SettingsSection({
 }: PropsWithChildren<Props>) {
   return (
     <section className="mb-6">
-      <label className="block font-semibold text-1xl">{label}</label>
+      <label className="block font-semibold text-1xl mb-2">{label}</label>
       {children}
     </section>
   );
