@@ -1,34 +1,38 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Title Builder
 
-## Getting Started
+This Web App lets you build titles which you can later use in streaming software, for instance.
 
-First, run the development server:
+It is built with NextJS, React, TypeScript, and Tailwind CSS.
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## Live Example
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Here you can see a running preview of the app:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+-> https://title-generator.vercel.app/
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Setup
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+In order to run the app on your local computer: clone the repository, change into the newly created directory and run `npm install`.
 
-## Learn More
+Make sure to set some local environment variables as described in the next paragraph.
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+It is important to set these variables in your local environment file `.env.local`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+| Variable    | Value                                     |
+| ----------- | ----------------------------------------- |
+| MONGODB_URI | mongodb://localhost:27017/title-generator |
+| APP_URL     | http://localhost:3000                     |
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app uses MongoDB in order to persist the titles. With the generated deep links of the titles they can later be embedded as a browser source within OBS Studio or any other similar streaming solution.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Deployment
+
+Feel free to deploy your app to vercel, it is currently the easiest way to get the app running live on the web.
+
+As for the database: MongoDB Atlas would be recommended since the service allows a simple setup and easy configuration.
+
+Enjoy creating colorful titles! :)
