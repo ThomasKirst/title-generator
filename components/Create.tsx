@@ -53,6 +53,7 @@ export default function Create({ initialTitle }: Props) {
     id: nanoid(12),
     text: '',
     fontColor: 'black',
+    fontFamily: 'Open Sans',
     fontSize: 'L',
     fontWeight: 'default',
     position,
@@ -83,6 +84,10 @@ export default function Create({ initialTitle }: Props) {
     if (inputField && inputField.current) {
       setTitle({ ...title, text: inputField?.current?.value });
     }
+  };
+
+  const changeFontFamily = (fontFamily: string) => {
+    setTitle({ ...title, fontFamily: fontFamily });
   };
 
   const increaseSize = (size: string) => {
@@ -162,6 +167,7 @@ export default function Create({ initialTitle }: Props) {
             ref={titleOutput}
             className={titleOutputClasses()}
             style={{
+              fontFamily: `'${title.fontFamily}'`,
               transform: `translateX(${position.x}px) translateY(${position.y}px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`,
               textShadow: title.shadow
                 ? '3px 3px 6px rgb(0 0 0 / 26%), 0 0 5px rgb(15 3 86 / 22%)'
@@ -177,7 +183,9 @@ export default function Create({ initialTitle }: Props) {
 
         <SettingsSection label="Text">
           <TextBox
+            fontFamily={title.fontFamily}
             inputField={inputField}
+            onChangeFontFamily={changeFontFamily}
             onApplyText={applyText}
             text={title.text}
           />

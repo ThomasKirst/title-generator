@@ -1,25 +1,49 @@
 import { MutableRefObject, SyntheticEvent } from 'react';
 
 interface Props {
+  fontFamily: string;
   inputField: MutableRefObject<HTMLTextAreaElement | null>;
   onApplyText: (event: SyntheticEvent) => void;
+  onChangeFontFamily: (fontFamily: string) => void;
   text: string;
 }
 
-export default function TextBox({ inputField, onApplyText, text }: Props) {
+const fonts = [
+  'Comic Neue',
+  'Lato',
+  'Merriweather',
+  'Montserrat',
+  'Open Sans',
+  'Oswald',
+  'Raleway',
+  'Roboto',
+  'Source Sans Pro',
+];
+
+export default function TextBox({
+  fontFamily,
+  inputField,
+  onApplyText,
+  onChangeFontFamily,
+  text,
+}: Props) {
   return (
     <>
       <textarea
         ref={inputField}
-        className="block shadow-md rounded ring-1 my-4 px-2 py-2 text-lg w-5/6 h-28"
+        className="block border-solid border-2 border-slate-300 my-2 px-2 py-2 rounded-md shadow-md text-lg w-5/6 h-28"
         defaultValue={text}
+        onChange={onApplyText}
       ></textarea>
-      <button
-        className="bg-purple-500 py-3 px-12 rounded-lg text-white"
-        onClick={onApplyText}
+      <select
+        className="border-solid border-2 border-slate-300 rounded-md shadow-md w-5/6 py-3 px-1"
+        onChange={(event) => onChangeFontFamily(event.target.value)}
+        value={fontFamily}
       >
-        Apply
-      </button>
+        {fonts.map((font, index) => (
+          <option key={index}>{font}</option>
+        ))}
+      </select>
     </>
   );
 }

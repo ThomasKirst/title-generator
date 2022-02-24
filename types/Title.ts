@@ -5,6 +5,7 @@ export default interface Title {
   id: string;
   text: string;
   fontColor: string;
+  fontFamily: string;
   fontSize: string;
   fontWeight: string;
   position: Position;
